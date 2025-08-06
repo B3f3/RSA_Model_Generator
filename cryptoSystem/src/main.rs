@@ -1,7 +1,7 @@
 use num_traits::{One};
 use num_primes::{BigUint, Generator};
 use rand::{self};
-
+use num_integer::Integer; // For gcd function
 fn main() {
     // Initialize a random number generator
     let mut rng = rand::rng();
@@ -49,6 +49,13 @@ fn main() {
     println!("Original message x:\n{}", x);
     println!("Encrypted message y:\n{}", y);
     println!("Decrypted message:\n{}", decrypted_x);
+
+
+    // Proof that it could easily be recovered;
+    println!("Public key (e, N):\n{}\n{}\n", e, N);
+    println!("Secret key (p): {}", p);
+    let recoveredSecret = recover_secret_key(&e, &N);
+    println!("Recovered Secret Key (p): {}", recoveredSecret);
 }
 
 /// Generates a random BigUint less than an upper bound
@@ -77,4 +84,9 @@ fn random_biguint_below<R: rand::Rng>(upper_bound: &BigUint, rng: &mut R) -> Big
         // Convert valid random bytes to BigUint
         return BigUint::from_bytes_be(&random_bytes);
     }
+}
+
+fn recover_secret_key(e: &BigUint, N: &BigUint) -> BigUint {
+    let e_minus_1 = e - BigUint::one();
+    e_minus_1.gcd(N)
 }
